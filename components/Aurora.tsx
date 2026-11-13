@@ -1,6 +1,6 @@
 'use client';
 // Recriação do efeito "Aurora" (React Bits) com OGL.
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Renderer, Program, Mesh, Triangle, Color } from 'ogl';
 
 const VERT = `#version 300 es
@@ -53,6 +53,12 @@ void main(){
   fragColor = vec4(col*a, a);
 }`;
 
+// Versão para WebGL1 (computadores/navegadores sem WebGL2)
+const VERT1 = `attribute vec2 position;
+void main(){ gl_Position = vec4(position, 0.0, 1.0); }`;
+const toGL1 = (f: string) =>
+  f.replace('#version 300 es\n', '').replace('out vec4 fragColor;', '').replace('fragColor =', 'gl_FragColor =');
+
 export interface AuroraProps {
   colorStops?: string[]; amplitude?: number; blend?: number; height?: number; speed?: number;
   glow?: number; scale?: number; brightness?: number; layers?: number; direction?: 'top' | 'bottom';
@@ -64,20 +70,34 @@ export default function Aurora({
   glow = 0.6, scale = 1, brightness = 1, direction = 'top', opacity = 1, mouseInteraction = true, intro = true,
 }: AuroraProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [failed, setFailed] = useState(false);
   const props = useRef({ amplitude, blend, height, speed, glow, scale, brightness, direction, opacity, mouseInteraction, intro, colorStops });
   props.current = { amplitude, blend, height, speed, glow, scale, brightness, direction, opacity, mouseInteraction, intro, colorStops };
 
   useEffect(() => {
     const host = ref.current;
     if (!host) return;
-    const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true });
+    // Testa o WebGL antes de usar a OGL (a OGL escreve um erro no console quando falha)
+    const probe = document.createElement('canvas');
+    const probeGl = (probe.getContext('webgl2') || probe.getContext('webgl')) as WebGLRenderingContext | null;
+    if (!probeGl) { setFailed(true); return; }
+    probeGl.getExtension('WEBGL_lose_context')?.loseContext();
+
+    let renderer: Renderer;
+    try {
+      renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true });
+    } catch {
+      setFailed(true); // sem WebGL: usa o fundo alternativo em CSS
+      return;
+    }
     const gl = renderer.gl;
+    if (!gl) { setFailed(true); return; }
     gl.clearColor(0, 0, 0, 0);
     gl.canvas.style.cssText = 'width:100%;height:100%;display:block';
     host.appendChild(gl.canvas);
 
     const program = new Program(gl, {
-      vertex: VERT, fragment: FRAG,
+      vertex: renderer.isWebgl2 ? VERT : VERT1, fragment: renderer.isWebgl2 ? FRAG : toGL1(FRAG),
       uniforms: {
         uTime: { value: 0 }, uAmplitude: { value: 1 }, uBlend: { value: 0.5 }, uHeight: { value: 0.45 },
         uGlow: { value: 0.6 }, uBrightness: { value: 1 }, uOpacity: { value: 1 }, uIntro: { value: 0 },
@@ -136,5 +156,6 @@ export default function Aurora({
     };
   }, []);
 
+  if (failed) return <div className="aurora-fallback" aria-hidden />;
   return <div ref={ref} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }} aria-hidden />;
 }

@@ -190,3 +190,11 @@ h1, h2, h3, h4 { font-family: var(--serif); line-height: 1.2; margin: 0 0 .6em; 
   .page-hero { padding: 80px 0; }
   .map { height: 380px; }
 }
+
+/* Fundo alternativo do hero quando o navegador não suporta WebGL */
+.aurora-fallback { position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 55% at 20% 0%, rgba(191,150,75,.45), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 75% 0%, rgba(5,57,89,.9), transparent 70%);
+  animation: auroraShift 10s ease-in-out infinite alternate; }
+@keyframes auroraShift { from { transform: translateX(-4%); opacity: .8; } to { transform: translateX(4%); opacity: 1; } }

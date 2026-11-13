@@ -6,11 +6,14 @@ import Footer from '@/components/Footer';
 export const metadata: Metadata = {
   title: 'Zeca Estofados | Sofás, camas, cadeiras e restauração',
   description: 'Fabricamos e restauramos sofás, camas, cadeiras de salão e bancos automotivos, em napa e tecido.',
+  icons: {
+    icon: '/images/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt">
+    <html lang="pt-BR" data-scroll-behavior="smooth">
       <body>
         <Header />
         <main>{children}</main>

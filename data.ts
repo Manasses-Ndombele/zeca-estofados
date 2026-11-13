@@ -1,6 +1,6 @@
 // Todos os dados de produtos e serviços do site (fonte única para todas as páginas).
 
-export const CURRENCY = { locale: 'pt-PT', code: 'EUR' }; // altere aqui a moeda do site
+export const CURRENCY = { locale: 'pt-BR', code: 'BRL' };
 export const formatPrice = (v: number) =>
   v === 0 ? 'Grátis' : new Intl.NumberFormat(CURRENCY.locale, { style: 'currency', currency: CURRENCY.code }).format(v);
 
@@ -53,21 +53,24 @@ const palette: ProductColor[] = [
 ];
 
 // Imagens de exemplo (troque pelas fotos reais de cada produto)
-const catalog: Record<Category, { image: string; base: number; names: string[] }> = {
+const imgs = (prefix: string, count: number, ext = 'jpg') =>
+  Array.from({ length: count }, (_, i) => `images/produtos/${prefix}-${i + 1}.${ext}`);
+
+const catalog: Record<Category, { images: string[]; base: number; names: string[] }> = {
   'Sofás': {
-    image: '/images/hero-sofa.png', base: 1290,
+    images: imgs('sofa', 14), base: 1290,
     names: ['Sofá Milão', 'Sofá Toscana', 'Sofá Veneza', 'Sofá Capri', 'Sofá Verona', 'Sofá Roma', 'Sofá Siena', 'Sofá Bari', 'Sofá Florença', 'Sofá Módena', 'Sofá Parma', 'Sofá Turim', 'Sofá Gênova', 'Sofá Pádua'],
   },
   'Camas': {
-    image: '/images/servicos-2.jpeg', base: 890,
-    names: ['Cama Lisboa', 'Cama Porto', 'Cama Évora', 'Cama Sintra', 'Cama Braga', 'Cama Faro', 'Cama Coimbra', 'Cama Aveiro', 'Cama Tavira', 'Cama Setúbal', 'Cama Viseu', 'Cama Leiria', 'Cama Óbidos', 'Cama Cascais'],
+    images: imgs('cama', 12), base: 890,
+    names: ['Cama Lisboa', 'Cama Porto', 'Cama Évora', 'Cama Sintra', 'Cama Braga', 'Cama Faro', 'Cama Coimbra', 'Cama Aveiro', 'Cama Tavira', 'Cama Setúbal', 'Cama Viseu', 'Cama Leiria'],
   },
   'Cadeiras': {
-    image: '/images/servicos-3.jpeg', base: 190,
-    names: ['Cadeira Aurora', 'Cadeira Luna', 'Cadeira Vênus', 'Cadeira Sol', 'Cadeira Íris', 'Cadeira Dália', 'Cadeira Jade', 'Cadeira Safira', 'Cadeira Opala', 'Cadeira Pérola', 'Cadeira Rubi', 'Cadeira Ônix', 'Cadeira Topázio', 'Cadeira Ágata'],
+    images: imgs('cadeira', 10), base: 190,
+    names: ['Cadeira Aurora', 'Cadeira Luna', 'Cadeira Vênus', 'Cadeira Sol', 'Cadeira Íris', 'Cadeira Dália', 'Cadeira Jade', 'Cadeira Safira', 'Cadeira Opala', 'Cadeira Pérola'],
   },
   'Sofás restaurados': {
-    image: '/images/servicos-4.jpeg', base: 690,
+    images: imgs('sofa', 14), base: 1290,
     names: ['Chesterfield restaurado', 'Retrô anos 60 restaurado', 'Clássico 3 lugares restaurado', 'Canto em L restaurado', 'Namoradeira restaurada', 'Sofá-cama restaurado', 'Cabedal vintage restaurado', 'Sofá colonial restaurado', 'Poltrona-sofá restaurada', 'Sofá reclinável restaurado', 'Sofá art déco restaurado', 'Sofá nórdico restaurado', 'Sofá capitonê restaurado', 'Sofá rústico restaurado'],
   },
 };
@@ -76,7 +79,7 @@ function buildProducts(): Product[] {
   let id = 1;
   const list: Product[] = [];
   for (const category of categories) {
-    const { names, image, base } = catalog[category];
+    const { names, images, base } = catalog[category];
     names.forEach((name, i) => {
       const nf = 1 + (i % 3 === 2 ? 1 : 0) + (i % 5 === 0 ? 1 : 0);
       const nc = 2 + (i % 3);
@@ -84,7 +87,7 @@ function buildProducts(): Product[] {
         id: id++,
         name,
         category,
-        image,
+        image: images[i % images.length],
         fabrics: Array.from({ length: nf }, (_, k) => fabricList[(i + k * 2) % 5]),
         colors: Array.from({ length: nc }, (_, k) => palette[(i * 3 + k * 2) % 8]),
         price: Math.round((base * (1 + ((i * 7) % 10) * 0.06)) / 10) * 10,
