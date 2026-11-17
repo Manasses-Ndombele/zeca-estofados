@@ -125,13 +125,13 @@ h1, h2, h3, h4 { font-family: var(--serif); line-height: 1.2; margin: 0 0 .6em; 
 .modal h3 { font-size: 26px; margin-bottom: 4px; }
 .modal-price { font-family: var(--serif); font-size: 24px; margin: 0 0 24px; color: var(--btn); }
 .modal-price small { font-family: var(--sans); font-size: 14px; color: #4a525a; }
-.modal form { display: grid; gap: 14px; }
-.modal label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-.modal input { padding: 12px; border: 1px solid #b8b8b2; border-radius: 0; font-size: 16px; background: #fff; color: var(--text); letter-spacing: 1px; }
+.modal form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.modal label { min-width: 0; display: grid; gap: 6px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.modal input { width: 100%; min-width: 0; padding: 12px; border: 1px solid #b8b8b2; border-radius: 0; font-size: 16px; background: #fff; color: var(--text); letter-spacing: 1px; }
 .modal input:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
 .modal em { color: #a32020; font-size: 12px; font-style: normal; text-transform: none; letter-spacing: 0; font-weight: 500; }
 .brand { color: var(--gold); margin-left: 6px; }
-.form-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 
 /* ---------- Serviços ---------- */
 .service-list { display: grid; gap: 40px; }
